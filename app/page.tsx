@@ -5,12 +5,8 @@ import Link from "next/link";
 import { FlightCodeDisplay } from "@/utils/flightFormatter";
 
 // 数据来源配置
-// 注意：由于安全限制，Vercel 部署的前端无法直接访问本地服务器
-// 解决方案：
-// 1. 使用内网穿透工具（如 ngrok）将本地 API 暴露到公网
-// 2. 或者将数据定期推送到 GitHub/Gist 等公开可访问的地方
-// 3. 或者使用 Cloudflare Tunnel
-const API_URL = ""; // 填入你的公网 API 地址，例如："https://your-ngrok-url.ngrok.io/live_data.json"
+// 使用 jsdelivr CDN 从 GitHub 获取数据，无需 ngrok
+const API_URL = "https://cdn.jsdelivr.net/gh/iamfrogtoo/tpe-goss@main/public/live_data.json";
 
 interface Flight {
   code: string;
