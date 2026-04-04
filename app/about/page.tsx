@@ -51,6 +51,11 @@ export default function About() {
             <div className="bg-[#1a1a1a] p-[20px] rounded-[8px] border border-[#333]">
                 <ul className="text-[#aaa] text-[14px] leading-relaxed space-y-3 font-mono">
                     <li className="flex items-start gap-3">
+                        <span className="text-[#f1c40f] font-bold shrink-0">2026/04/04</span>
+                        <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">4.0 測試版</span>
+                        <span className="text-[#ccc]">新版架構敬請期待，使用 SQLite3 資料庫，整合本地天線與 OpenSky 數據融合。</span>
+                    </li>
+                    <li className="flex items-start gap-3">
                         <span className="text-[#00f260] font-bold shrink-0">2026/03/11</span>
                         <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">2.7 版</span>
                         <span className="text-[#ccc]">🎉 瀏覽人次突破 1,000！新增 LINE 錯誤反饋 Bot 懸浮按鈕（全站右下角一鍵加好友），建立討論群組。修正入境追蹤器時間窗異常放行與重複航班判斷邏輯。</span>
