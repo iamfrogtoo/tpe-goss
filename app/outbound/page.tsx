@@ -205,19 +205,19 @@ export default function Outbound() {
                                     <FlightCodeDisplay rawCode={f.code} />
                                 </div>
                                 <div className="flex flex-wrap items-center gap-[6px] mt-1 w-full">
-                                    {f.actype && <span className="text-[12px] text-[#888] font-mono whitespace-nowrap overflow-hidden text-ellipsis">{f.actype}</span>}
-                                    {f.reg && <span className="bg-[#333] px-[4px] py-[2px] rounded text-[10px] text-[#ddd] font-mono">{f.reg}</span>}
+                                    {f.actype && <span className="text-[12px] text-[#ccc] font-mono whitespace-nowrap overflow-hidden text-ellipsis">{f.actype}</span>}
+                                    {f.reg && <span className="bg-[#444] px-[4px] py-[2px] rounded text-[10px] text-[#fff] font-mono">{f.reg}</span>}
                                 </div>
                                 <span className="text-[14px] font-bold text-[#ffca28] mt-1 block">ETD {f.etd ? f.etd.slice(0, 5) : f.std.slice(0, 5)}</span>
                             </div>
 
                             {/* Center Column: Status & Counter */}
                             <div className="w-[30%] text-center flex flex-col justify-center items-center">
-                                <span className="text-[10px] bg-[#333] px-[8px] py-[3px] rounded-[10px] mx-auto text-[#ccc] flex gap-2">
+                                <span className="text-[10px] bg-[#444] px-[8px] py-[3px] rounded-[10px] mx-auto text-[#fff] flex gap-2">
                                     {f.terminal !== "-" && <span>T{f.terminal}</span>}
                                     {f.counter !== "-" && <span className="text-[#00f260]">櫃檯 {f.counter}</span>}
                                 </span>
-                                <span className="text-[12px] text-[#aaa] mt-2 block px-[8px] py-[3px] bg-[#333] rounded-[4px] min-w-[60px]">
+                                <span className="text-[12px] text-[#fff] mt-2 block px-[8px] py-[3px] bg-[#444] rounded-[4px] min-w-[60px]">
                                     {f.statusText}
                                 </span>
                             </div>

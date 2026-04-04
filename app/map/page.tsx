@@ -227,24 +227,24 @@ export default function MobileMap() {
                     if (!g) return <div key={idx} className="invisible"></div>;
 
                     const data = gateMap[g];
-                    let boxClass = "bg-[#111] border-[#333] text-[#666]";
+                    let boxClass = "bg-[#1a1a1a] border-[#444] text-[#aaa]";
                     const isSpecialRemote = ["B1R", "C5R", "D5R"].includes(g);
 
                     if (data) {
                         if (isSpecialRemote) {
-                            boxClass = "bg-[#111] border-[#333] text-[#eee]";
+                            boxClass = "bg-[#1a1a1a] border-[#444] text-[#fff]";
                         } else {
                             if (data.isOccupied) {
                                 // 佔貝: White background, black text
                                 boxClass = "bg-[#fff] border-[#fff] text-[#000] shadow-[0_0_8px_rgba(255,255,255,0.4)]";
                             } else if (data.isDep) {
                                 // 離場準備: Dark yellow bg, yellow border
-                                boxClass = "bg-[#2a2200] border-[#f1c40f] text-[#f1c40f]";
+                                boxClass = "bg-[#332800] border-[#f1c40f] text-[#fff]";
                             } else if (data.isArr) {
                                 // 準備進場: Dark red bg, red border
-                                boxClass = "bg-[#2a0000] border-[#ff4b4b] text-[#ff4b4b]";
+                                boxClass = "bg-[#330000] border-[#ff4b4b] text-[#fff]";
                             } else if (data.flightStr) { // Has assignment but not active yet
-                                boxClass = "bg-[#1a1a1a] border-[#555] text-[#aaa]";
+                                boxClass = "bg-[#222] border-[#666] text-[#ccc]";
                             }
                         }
                     }
@@ -261,12 +261,12 @@ export default function MobileMap() {
                                     <span className="text-[14px] text-white font-bold leading-none mb-[4px]">{g}</span>
                                     <div className="flex-1 w-full flex flex-col items-center justify-center gap-[2px]">
                                         {data?.activeFlights?.slice(0, 3).map((fl, i) => (
-                                            <span key={i} className="text-[11px] font-mono text-[#ccc] leading-none tracking-tight">
+                                            <span key={i} className="text-[11px] font-mono text-[#fff] leading-none tracking-tight">
                                                 {fl}
                                             </span>
                                         ))}
                                         {data?.activeFlights && data.activeFlights.length > 3 && (
-                                            <span className="text-[10px] text-[#888] leading-none tracking-tight">
+                                            <span className="text-[10px] text-[#aaa] leading-none tracking-tight">
                                                 +{data.activeFlights.length - 3}
                                             </span>
                                         )}
@@ -274,9 +274,9 @@ export default function MobileMap() {
                                 </>
                             ) : (
                                 <div className="flex flex-col items-center justify-center w-full h-full p-1 relative">
-                                    <span className="text-[clamp(14px,4vw,22px)] leading-none mb-1">{g}</span>
+                                    <span className="text-[clamp(14px,4vw,22px)] leading-none mb-1 text-[#fff]">{g}</span>
                                     {data?.flightStr && (
-                                        <span className="text-[clamp(10px,3vw,16px)] font-bold leading-none select-none tracking-tight text-center break-all">
+                                        <span className="text-[clamp(10px,3vw,16px)] font-bold leading-none select-none tracking-tight text-center break-all text-[#fff]">
                                             {data.flightStr.substring(0, 6)}
                                         </span>
                                     )}
