@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FlightCodeDisplay } from "@/utils/flightFormatter";
 
+// 数据来源配置
+// 注意：由于安全限制，Vercel 部署的前端无法直接访问本地服务器
+// 解决方案：
+// 1. 使用内网穿透工具（如 ngrok）将本地 API 暴露到公网
+// 2. 或者将数据定期推送到 GitHub/Gist 等公开可访问的地方
+// 3. 或者使用 Cloudflare Tunnel
+const API_URL = ""; // 填入你的公网 API 地址，例如："https://your-ngrok-url.ngrok.io/live_data.json"
+
 interface Flight {
   code: string;
   actype: string;
@@ -22,80 +30,111 @@ interface Flight {
 export default function Home() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [lastUpdate, setLastUpdate] = useState("連線中...");
+  const [dataSource, setDataSource] = useState("模擬數據");
+
+  // 模拟数据 - 作为 fallback
+  const getMockFlights = (): Flight[] => {
+    return [
+      {
+        code: "CI101",
+        actype: "A330-300",
+        reg: "B-18301",
+        terminal: "1",
+        gate: "A5",
+        baggage: "5",
+        sta: "10:30",
+        eta: "10:25",
+        alt: "5280",
+        statusText: "進場中",
+        statusClass: "",
+        isRemote: false
+      },
+      {
+        code: "EVA221",
+        actype: "B777-300ER",
+        reg: "B-16708",
+        terminal: "2",
+        gate: "B7",
+        baggage: "12",
+        sta: "11:15",
+        eta: "11:10",
+        alt: "3450",
+        statusText: "即將落地",
+        statusClass: "",
+        isRemote: false
+      },
+      {
+        code: "CA185",
+        actype: "B737-800",
+        reg: "B-5488",
+        terminal: "1",
+        gate: "505",
+        baggage: "8",
+        sta: "12:00",
+        eta: "12:00",
+        alt: "0",
+        statusText: "已落地",
+        statusClass: "",
+        isRemote: true
+      }
+    ];
+  };
+
+  const processFlightData = (flightData: any): Flight => {
+    let statusText = "進場中";
+    const alt = parseInt(flightData.alt) || 0;
+    
+    if (alt === 0) {
+      statusText = "已落地";
+    } else if (alt < 1000) {
+      statusText = "即將落地";
+    }
+
+    return {
+      code: flightData.code || flightData.flight_no || "UNKNOWN",
+      actype: flightData.actype || "",
+      reg: flightData.reg || "",
+      terminal: flightData.terminal || "-",
+      gate: flightData.gate || "-",
+      baggage: flightData.baggage || "-",
+      sta: flightData.scheduled_time || flightData.sta || "",
+      eta: flightData.actual_time || flightData.eta || "",
+      alt: flightData.alt || "0",
+      statusText,
+      statusClass: "",
+      isRemote: flightData.gate ? (flightData.gate.startsWith('5') || flightData.gate.startsWith('6')) : false
+    };
+  };
 
   const fetchData = async () => {
     try {
-      // 模擬從後端 API 获取数据
-      // 实际项目中，这里应该调用后端 API 获取 goss_v4.db 中的数据
-      
-      // 模拟数据 - 使用桃园机场真实机坪和正确的入境航班信息
-      // 注意：这是模拟数据，后续将整合 goss_v4.db 中的实时数据
-      const mockFlights = [
-        {
-          code: "CI101",
-          actype: "A330-300",
-          reg: "B-18301",
-          terminal: "1",
-          gate: "A5",
-          baggage: "5",
-          sta: "10:30",
-          eta: "10:25",
-          alt: "5280",
-          statusText: "進場中"
-        },
-        {
-          code: "EVA221",
-          actype: "B777-300ER",
-          reg: "B-16708",
-          terminal: "2",
-          gate: "B7",
-          baggage: "12",
-          sta: "11:15",
-          eta: "11:10",
-          alt: "3450",
-          statusText: "即將落地"
-        },
-        {
-          code: "CA185",
-          actype: "B737-800",
-          reg: "B-5488",
-          terminal: "1",
-          gate: "505",
-          baggage: "8",
-          sta: "12:00",
-          eta: "12:00",
-          alt: "0",
-          statusText: "已落地"
-        },
-        {
-          code: "ANA879",
-          actype: "B787-9",
-          reg: "JA832A",
-          terminal: "2",
-          gate: "D12",
-          baggage: "15",
-          sta: "12:45",
-          eta: "12:50",
-          alt: "8760",
-          statusText: "進場中"
-        },
-        {
-          code: "JAL809",
-          actype: "B767-300ER",
-          reg: "JA606J",
-          terminal: "2",
-          gate: "610",
-          baggage: "10",
-          sta: "13:30",
-          eta: "13:25",
-          alt: "6230",
-          statusText: "進場中"
-        }
-      ];
+      let parsedFlights: Flight[] = [];
+      let source = "模擬數據";
 
-      // 处理状态类和远程机坪判断
-      const parsedFlights = mockFlights.map(flight => {
-        let statusClass = "border-l-[5px] border-[#444] bg-[#1e1e1e]"; // default
+      // 尝试从 API 获取数据
+      if (API_URL) {
+        try {
+          const res = await fetch(`${API_URL}?t=${Date.now()}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.flights && data.flights.length > 0) {
+              parsedFlights = data.flights.map(processFlightData);
+              source = "即時數據";
+            }
+          }
+        } catch (apiError) {
+          console.log("API 獲取失敗，使用模擬數據:", apiError);
+        }
+      }
+
+      // 如果没有从 API 获取到数据，使用模拟数据
+      if (parsedFlights.length === 0) {
+        parsedFlights = getMockFlights();
+      }
+
+      // 处理状态类
+      parsedFlights = parsedFlights.map(flight => {
+        let statusClass = "border-l-[5px] border-[#444] bg-[#1e1e1e]";
         if (flight.statusText.includes("即將落地")) {
           statusClass = "border-l-[5px] border-[#ff4b4b] bg-gradient-to-r from-[rgba(255,75,75,0.1)] to-transparent";
         } else if (flight.statusText.includes("進場中")) {
@@ -104,19 +143,13 @@ export default function Home() {
           statusClass = "border-l-[5px] border-[#4facfe] bg-[#1e1e1e]/80";
         }
 
-        // 正确判断远程机坪（500和600系列）
-        const isRemote = flight.gate ? 
-          (flight.gate.startsWith('5') || flight.gate.startsWith('6')) : 
-          false;
-
         return {
           ...flight,
-          statusClass,
-          isRemote
+          statusClass
         };
       });
 
-      // 按高度排序（从低到高，符合航班进近逻辑）
+      // 按高度排序（从低到高）
       const sortedFlights = [...parsedFlights].sort((a, b) => {
         const altA = parseInt(a.alt) || 0;
         const altB = parseInt(b.alt) || 0;
@@ -124,7 +157,8 @@ export default function Home() {
       });
 
       setFlights(sortedFlights);
-      setLastUpdate(`更新: ${new Date().toLocaleTimeString()} (${sortedFlights.length}架)`);
+      setDataSource(source);
+      setLastUpdate(`更新: ${new Date().toLocaleTimeString()} (${sortedFlights.length}架) - ${source}`);
     } catch (error) {
       console.error(error);
       setLastUpdate("連線失敗");
