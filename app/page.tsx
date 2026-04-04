@@ -116,11 +116,11 @@ export default function Home() {
         };
       });
 
-      // 按高度排序（从高到低，符合航班进近逻辑）
+      // 按高度排序（从低到高，符合航班进近逻辑）
       const sortedFlights = [...parsedFlights].sort((a, b) => {
         const altA = parseInt(a.alt) || 0;
         const altB = parseInt(b.alt) || 0;
-        return altB - altA;
+        return altA - altB;
       });
 
       setFlights(sortedFlights);
