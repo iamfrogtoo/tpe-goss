@@ -137,7 +137,7 @@ export default function Outbound() {
                     const diff = (etdObj.getTime() - now.getTime()) / 60000;
 
                     if (diff < 0) {
-                        statusClass = "border-b border-[#333] bg-[#1a1a1a] opacity-60"; // Departed
+                        statusClass = "border-b border-[#333] bg-gradient-to-r from-[rgba(255,75,75,0.3)] to-transparent border-l-[4px] border-l-[#ff4b4b]"; // 超過時間，紅底
                     } else if (diff <= 30) {
                         statusClass = "border-b border-[#333] bg-gradient-to-r from-[rgba(241,196,15,0.1)] to-transparent border-l-[4px] border-l-[#f1c40f]"; // Urgent
                     }
