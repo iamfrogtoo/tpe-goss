@@ -241,7 +241,7 @@ export default function Outbound() {
                                 ) : (
                                     <span className="text-[28px] font-bold leading-none text-[#00f260]">-</span>
                                 )}
-                                <span className="text-[10px] text-[#666] mt-1">GATE</span>
+                                <span className="text-[10px] text-[#aaa] mt-1">GATE</span>
                             </div>
                         </div>
                     ))}
