@@ -1,0 +1,36 @@
+Subject: PiAware Feeder ID Binding Issue
+
+Dear FlightAware Support Team,
+
+I hope this email finds you well. My name is Xin Zhi, and I'm running a PiAware ADS-B feeder at Taoyuan International Airport in Taiwan.
+
+**Feeder Information:**
+- Feeder ID: 618eff2a-b83c-44bf-9346-3e9ea37ea087
+- Location: Taoyuan, Taiwan (IATA: TPE)
+- Hardware: Raspberry Pi with SDR receiver
+- Software: Docker-based PiAware container (latest version)
+
+**Issue Description:**
+I have followed the standard procedure to claim my feeder through the FlightAware website (https://flightaware.com/adsb/piaware/claim), but my device still shows as unassociated after more than 5 minutes. The PiAware container is running properly and has successfully connected to your servers, as evidenced by the logs showing data being transmitted.
+
+**Steps Already Taken:**
+1. Accessed the claim page and entered the Feeder ID
+2. Followed the on-screen instructions to complete the claiming process
+3. Waited more than 5 minutes for the association to take effect
+4. Verified that the PiAware container is running healthy
+5. Confirmed that data is being sent to FlightAware servers
+
+**Additional Information:**
+- The PiAware container status: Up 2 days (healthy)
+- Data transmission: Over 22,000 messages sent to FlightAware
+- Network connection: Stable wired connection (not using Wi-Fi)
+
+Could you please assist me in resolving this binding issue? I would like to properly associate this feeder with my FlightAware account to access the Enterprise membership benefits.
+
+Thank you for your time and assistance.
+
+Best regards,
+Xin Zhi
+Taoyuan Airport Ground Operations Surveillance System
+Email: [your email address]
+Phone: [your phone number (optional)]

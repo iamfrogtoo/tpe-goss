@@ -1,0 +1,25 @@
+# AI Agent 專案行為準則 (Project Instructions)
+
+## 1. 核心語言規範 (Language Requirements)
+* **強制繁體中文**：你必須**嚴格使用繁體中文 (Traditional Chinese, Taiwan)** 進行所有的對話、思考過程 (Plan)、以及解釋。
+* **禁止簡體字**：請勿輸出任何簡體中文。
+* **技術術語保留**：專有名詞、變數名稱、套件名稱請保持 **英文**，不要進行不必要的翻譯。
+    * ⭕ 正確：我們使用 Next.js 和 Tailwind CSS。
+    * ❌ 錯誤：我們使用 下一代JS 和 順風CSS。
+
+## 2. 程式碼規範 (Coding Standards)
+* **註解 (Comments)**：所有的程式碼註解 (Comments) 必須使用 **繁體中文** 撰寫，解釋這段程式碼的邏輯。
+* **命名慣例**：
+    * 變數/函式：使用 `camelCase` (如 `fetchFlightData`)。
+    * 元件 (Components)：使用 `PascalCase` (如 `FlightCard`)。
+* **錯誤處理**：程式碼必須包含基本的 Error Handling 機制。
+
+## 3. 專案背景 (Context)
+* 這是一個 **航空資訊網頁指南** 專案。
+* 目標：提供桃園機場 (TPE) 的相關資訊、航班追蹤或教學。
+* 開發者背景：使用者是資深開發者，熟悉 Python 與 Next.js，請直接提供高品質的程式碼，不需過度解釋基礎語法。
+
+## 4. 回應風格
+* 直接、簡潔、專業。
+* 在執行任務前，先用中文簡述你的計畫 (Plan)。
+* **修復計劃 (Implementation Plan)**、**任務進度更新 (Progress Updates / Task Status / Task Summary)** 等所有 AI 內部機制與對話，必須一律使用 **繁體中文** 撰寫輸出。

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天线活动状态监控工具</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .status-card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-active {
+            border-left: 4px solid #28a745;
+        }
+        .status-weak {
+            border-left: 4px solid #ffc107;
+        }
+        .status-inactive {
+            border-left: 4px solid #dc3545;
+        }
+        .status-error {
+            border-left: 4px solid #6c757d;
+        }
+        .signal-bar {
+            height: 10px;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        .alert-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.8rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .btn-action {
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">天线活动状态监控工具</h1>
+        
+        <!-- 状态概览 -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card status-card bg-white shadow-sm p-4" id="status-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">当前状态</h5>
+                        <span class="badge bg-secondary" id="status-badge">未知</span>
+                    </div>
+                    <div class="mt-4">
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span>信号强度</span>
+                            <span id="signal-strength">0%</span>
+                        </div>
+                        <div class="progress mb-4">
+                            <div class="signal-bar bg-info" id="signal-bar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-muted small" id="last-checked">最后检查: 未检查</p>
+                        <p class="card-text mt-2" id="status-message">状态信息</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card bg-white shadow-sm p-4">
+                    <h5 class="card-title">操作控制</h5>
+                    <div class="d-flex gap-3 mt-3">
+                        <button class="btn btn-primary btn-action" id="check-now">立即检查</button>
+                        <button class="btn btn-success btn-action" id="start-monitor">启动监控</button>
+                        <button class="btn btn-danger btn-action" id="stop-monitor">停止监控</button>
+                        <div class="ms-auto">
+                            <select class="form-select" id="history-hours">
+                                <option value="24">24小时</option>
+                                <option value="48">48小时</option>
+                                <option value="72">72小时</option>
+                                <option value="168">7天</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 数据图表 -->
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div class="card bg-white shadow-sm p-4">
+                    <h5 class="card-title">信号强度历史</h5>
+                    <div class="chart-container">
+                        <canvas id="signal-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 告警记录 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card bg-white shadow-sm p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">告警记录</h5>
+                        <span class="badge bg-danger" id="alert-count">0</span>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>类型</th>
+                                    <th>信息</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alerts-table">
+                                <tr>
+                                    <td colspan="5" class="text-center">暂无告警记录</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let signalChart;
+        let monitoringInterval;
+        
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('signal-chart').getContext('2d');
+            signalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '信号强度 (%)',
+                        data: [],
+                        borderColor: '#17a2b8',
+                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '信号强度 (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '时间'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新状态
+        function updateStatus() {
+            axios.get('/api/status')
+                .then(response => {
+                    const status = response.data;
+                    
+                    // 更新状态卡片
+                    document.getElementById('status-badge').textContent = status.status;
+                    document.getElementById('signal-strength').textContent = `${status.signal_strength.toFixed(2)}%`;
+                    document.getElementById('signal-bar').style.width = `${status.signal_strength}%`;
+                    document.getElementById('last-checked').textContent = `最后检查: ${formatTime(status.last_checked)}`;
+                    
+                    // 更新状态信息和样式
+                    const statusCard = document.getElementById('status-card');
+                    statusCard.className = 'card status-card bg-white shadow-sm p-4';
+                    
+                    switch(status.status) {
+                        case 'active':
+                            statusCard.classList.add('status-active');
+                            document.getElementById('status-badge').className = 'badge bg-success';
+                            document.getElementById('signal-bar').className = 'signal-bar bg-success';
+                            document.getElementById('status-message').textContent = '天线工作正常';
+                            break;
+                        case 'weak':
+                            statusCard.classList.add('status-weak');
+                            document.getElementById('status-badge').className = 'badge bg-warning';
+                            document.getElementById('signal-bar').className = 'signal-bar bg-warning';
+                            document.getElementById('status-message').textContent = '信号强度较弱';
+                            break;
+                        case 'inactive':
+                            statusCard.classList.add('status-inactive');
+                            document.getElementById('status-badge').className = 'badge bg-danger';
+                            document.getElementById('signal-bar').className = 'signal-bar bg-danger';
+                            document.getElementById('status-message').textContent = '信号强度过低，天线可能异常';
+                            break;
+                        case 'error':
+                            statusCard.classList.add('status-error');
+                            document.getElementById('status-badge').className = 'badge bg-secondary';
+                            document.getElementById('signal-bar').className = 'signal-bar bg-secondary';
+                            document.getElementById('status-message').textContent = '检查天线状态时出错';
+                            break;
+                        default:
+                            document.getElementById('status-badge').className = 'badge bg-secondary';
+                            document.getElementById('signal-bar').className = 'signal-bar bg-secondary';
+                            document.getElementById('status-message').textContent = '状态未知';
+                    }
+                })
+                .catch(error => {
+                    console.error('获取状态失败:', error);
+                });
+        }
+        
+        // 更新历史数据
+        function updateHistory() {
+            const hours = document.getElementById('history-hours').value;
+            
+            axios.get(`/api/history?hours=${hours}`)
+                .then(response => {
+                    const history = response.data;
+                    
+                    // 准备图表数据
+                    const labels = history.reverse().map(item => {
+                        return formatTime(item.timestamp, true);
+                    });
+                    const data = history.reverse().map(item => item.signal_strength);
+                    
+                    // 更新图表
+                    signalChart.data.labels = labels;
+                    signalChart.data.datasets[0].data = data;
+                    signalChart.update();
+                })
+                .catch(error => {
+                    console.error('获取历史数据失败:', error);
+                });
+        }
+        
+        // 更新告警记录
+        function updateAlerts() {
+            axios.get('/api/alerts')
+                .then(response => {
+                    const alerts = response.data;
+                    const alertsTable = document.getElementById('alerts-table');
+                    
+                    document.getElementById('alert-count').textContent = alerts.length;
+                    
+                    if (alerts.length === 0) {
+                        alertsTable.innerHTML = '<tr><td colspan="5" class="text-center">暂无告警记录</td></tr>';
+                        return;
+                    }
+                    
+                    alertsTable.innerHTML = alerts.map(alert => {
+                        const statusClass = alert.status === 'unread' ? 'badge bg-danger' : 'badge bg-secondary';
+                        const statusText = alert.status === 'unread' ? '未读' : '已读';
+                        const actionButton = alert.status === 'unread' ? 
+                            `<button class="btn btn-sm btn-outline-primary mark-read" data-id="${alert.id}">标记已读</button>` : 
+                            '<span class="text-muted">已处理</span>';
+                        
+                        return `
+                            <tr>
+                                <td>${formatTime(alert.timestamp)}</td>
+                                <td><span class="badge bg-info">${alert.alert_type}</span></td>
+                                <td>${alert.message}</td>
+                                <td><span class="${statusClass}">${statusText}</span></td>
+                                <td>${actionButton}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    // 添加标记已读事件
+                    document.querySelectorAll('.mark-read').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const alertId = this.getAttribute('data-id');
+                            markAlertAsRead(alertId);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('获取告警记录失败:', error);
+                });
+        }
+        
+        // 标记告警为已读
+        function markAlertAsRead(alertId) {
+            axios.get(`/api/alert/read/${alertId}`)
+                .then(response => {
+                    if (response.data.success) {
+                        updateAlerts();
+                    }
+                })
+                .catch(error => {
+                    console.error('标记告警失败:', error);
+                });
+        }
+        
+        // 立即检查
+        document.getElementById('check-now').addEventListener('click', function() {
+            this.disabled = true;
+            this.textContent = '检查中...';
+            
+            axios.get('/api/check')
+                .then(response => {
+                    updateStatus();
+                    updateHistory();
+                    updateAlerts();
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.textContent = '立即检查';
+                });
+        });
+        
+        // 启动监控
+        document.getElementById('start-monitor').addEventListener('click', function() {
+            axios.get('/api/start')
+                .then(response => {
+                    if (response.data.success) {
+                        alert('监控已启动');
+                    }
+                })
+                .catch(error => {
+                    console.error('启动监控失败:', error);
+                });
+        });
+        
+        // 停止监控
+        document.getElementById('stop-monitor').addEventListener('click', function() {
+            axios.get('/api/stop')
+                .then(response => {
+                    if (response.data.success) {
+                        alert('监控已停止');
+                    }
+                })
+                .catch(error => {
+                    console.error('停止监控失败:', error);
+                });
+        });
+        
+        // 历史时间选择
+        document.getElementById('history-hours').addEventListener('change', updateHistory);
+        
+        // 格式化时间
+        function formatTime(timestamp, short = false) {
+            const date = new Date(timestamp);
+            if (short) {
+                return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+            }
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            updateStatus();
+            updateHistory();
+            updateAlerts();
+            
+            // 每30秒自动更新
+            monitoringInterval = setInterval(() => {
+                updateStatus();
+                updateAlerts();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

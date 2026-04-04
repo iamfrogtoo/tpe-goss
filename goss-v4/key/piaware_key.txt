@@ -1,0 +1,19 @@
+# PiAware Feeder ID
+Feeder ID: 618eff2a-b83c-44bf-9346-3e9ea37ea087
+
+# FlightAware 账号绑定步骤
+1. 访问 FlightAware 网站：https://flightaware.com/account/join
+2. 注册或登录您的账号
+3. 访问：https://flightaware.com/adsb/piaware/claim
+4. 输入上面的 Feeder ID
+5. 按照提示完成配对过程
+
+# 验证绑定状态
+- 绑定完成后，PiAware 日志中的登录用户将不再是 "guest"
+- 可以在 FlightAware 网站上查看 feeder 状态
+
+# 当前状态
+- PiAware 容器正在运行：Up 2 days (healthy)
+- 已成功连接到 FlightAware 服务器
+- 已开始发送 ADS-B 数据
+- 等待账号绑定

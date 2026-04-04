@@ -1,0 +1,117 @@
+xinzhi@tpe-goss-pi:~ $ curl http://localhost:8888/aircraft.json
+curl: (7) Failed to connect to localhost port 8888 after 0 ms: Couldn't connect to server
+xinzhi@tpe-goss-pi:~ $ sudo ufw status
+sudo: ufw: command not found
+xinzhi@tpe-goss-pi:~ $ lsusb
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 0bda:2832 Realtek Semiconductor Corp. RTL2832U DVB-T
+Bus 001 Device 002: ID 2109:3431 VIA Labs, Inc. Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+xinzhi@tpe-goss-pi:~ $ sudo systemctl status fr24feed
+Unit fr24feed.service could not be found.
+xinzhi@tpe-goss-pi:~ $ uname -a
+Linux tpe-goss-pi 6.12.75+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.12.75-1+rpt1~bookworm (2026-03-11) aarch64 GNU/Linux
+xinzhi@tpe-goss-pi:~ $ sudo systemctl list-units --type=service --state=running
+  UNIT                       LOAD   ACTIVE SUB     DESCRIPTION
+  adsbexchange-feed.service  loaded active running adsbexchange-feed
+  adsbexchange-mlat.service  loaded active running adsbexchange-mlat
+  adsbexchange-stats.service loaded active running ADSBexchange Stats
+  avahi-daemon.service       loaded active running Avahi mDNS/DNS-SD Stack
+  bluetooth.service          loaded active running Bluetooth service
+  containerd.service         loaded active running containerd container runtime
+  cron.service               loaded active running Regular background program processing daemon
+  dbus.service               loaded active running D-Bus System Message Bus
+  docker.service             loaded active running Docker Application Container Engine
+  getty@tty1.service         loaded active running Getty on tty1
+  icecast2.service           loaded active running LSB: Icecast2 streaming media server
+  ModemManager.service       loaded active running Modem Manager
+  NetworkManager.service     loaded active running Network Manager
+  polkit.service             loaded active running Authorization Manager
+  ssh.service                loaded active running OpenBSD Secure Shell server
+  systemd-journald.service   loaded active running Journal Service
+  systemd-logind.service     loaded active running User Login Management
+  systemd-timesyncd.service  loaded active running Network Time Synchronization
+  systemd-udevd.service      loaded active running Rule-based Manager for Device Events and Files
+  triggerhappy.service       loaded active running triggerhappy global hotkey daemon
+  user@1000.service          loaded active running User Manager for UID 1000
+  wpa_supplicant.service     loaded active running WPA supplicant
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+22 loaded units listed.
+xinzhi@tpe-goss-pi:~ $ sudo systemctl list-unit-files --type=service
+UNIT FILE                                  STATE           PRESET
+adsbexchange-feed.service                  enabled         enabled
+adsbexchange-mlat.service                  enabled         enabled
+adsbexchange-stats.service                 enabled         enabled
+alsa-restore.service                       static          -
+alsa-state.service                         static          -
+alsa-utils.service                         masked          enabled
+apparmor.service                           enabled         enabled
+apt-daily-upgrade.service                  static          -
+apt-daily.service                          static          -
+auth-rpcgss-module.service                 static          -
+autovt@.service                            alias           -
+avahi-daemon.service                       enabled         enabled
+bluetooth.service                          enabled         enabled
+console-getty.service                      disabled        disabled
+console-setup.service                      enabled         enabled
+container-getty@.service                   static          -
+containerd.service                         enabled         enabled
+cron.service                               enabled         enabled
+cryptdisks-early.service                   masked          enabled
+cryptdisks.service                         masked          enabled
+dbus-fi.w1.wpa_supplicant1.service         alias           -
+dbus-org.bluez.service                     alias           -
+dbus-org.freedesktop.Avahi.service         alias           -
+dbus-org.freedesktop.hostname1.service     alias           -
+dbus-org.freedesktop.locale1.service       alias           -
+dbus-org.freedesktop.login1.service        alias           -
+dbus-org.freedesktop.ModemManager1.service alias           -
+dbus-org.freedesktop.nm-dispatcher.service alias           -
+
+xinzhi@tpe-goss-pi:~ $ ps aux | grep -v "grep" | sort -nrk 3,3 | head -20
+xinzhi   2207177  200  0.1  11272  4416 pts/1    R+   17:07   0:00 ps aux
+root     1748361 15.2  0.3 756632 13792 ?        Sl   Mar28 216:38 /usr/local/bin/readsb --net --quiet --lat 25.07 --lon 121.23 --write-json=/run/readsb --write-state=/var/globe_history --json-reliable=1 --net-json-port=30047 --net-ri-port=30001 --net-ro-port=30002 --net-sbs-port=30003 --net-sbs-in-port=32006 --net-sbs-jaero-in-port=32009 --jaero-timeout=720 --net-bi-port=30004,30104 --net-bo-port=30005 --net-beast-reduce-out-port=30006 --net-api-port=30152 --heatmap-dir=/var/globe_history --heatmap=15 --net-sbs-reduce --net-beast-reduce-interval=0.5 --json-trace-interval=15 --net-heartbeat=35 --net-ro-interval-beast-reduce=0.12 --device-type=rtlsdr --gain=49.6 --device=0
+root     1747860  1.4  0.1 1894724 4816 ?        Sl   Mar28  19:58 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 30005 -container-ip 172.17.0.2 -container-port 30005 -use-listen-fd
+adsbexc+ 2094522  1.4  0.6  31184 23412 ?        S<s  13:00   3:36 /usr/local/share/adsbexchange/venv/bin/python3 /usr/local/share/adsbexchange/venv/bin/mlat-client --input-type dump1090 --no-udp --input-connect 127.0.0.1:30005 --server feed.adsbexchange.com:31090 --user Goss-TPE --lat 24.989490 --lon 121.288564 --alt 213ft --results beast,connect,127.0.0.1:30104 --results basestation,listen,31003 --results beast,listen,30157 --results beast,connect,127.0.0.1:30154
+adsbexc+ 2094995  1.2  0.2 544740  9612 ?        S<sl 13:00   3:00 /usr/local/share/adsbexchange/feed-adsbx --net --net-only --quiet --write-json /run/adsbexchange-feed --net-beast-reduce-interval 0.5 --net-connector feed1.adsbexchange.com,30004,beast_reduce_out,feed2.adsbexchange.com,64004 --net-heartbeat 60 --net-ro-size 1280 --net-ro-interval 0.2 --net-ro-port 0 --net-sbs-port 0 --net-bi-port 30154 --net-bo-port 0 --net-ri-port 0 --write-json-every 1 --lat 24.989490 --lon 121.288564 --max-range 450 --json-location-accuracy 2 --range-outline-hours 24 --net-connector 127.0.0.1,30978,uat_in,silent_fail --net-connector 127.0.0.1,30005,beast_in,silent_fail
+root     2014637  0.9  0.3 549744 12664 ?        Sl   08:31   4:57 /usr/local/bin/fr24feed
+root      966084  0.5  0.1  80416  4252 ?        Sl   Mar26  24:33 /usr/local/bin/beast-splitter --net 192.168.31.221:30005 --connect 127.0.0.1:30004
+root      966062  0.5  0.2  15220  8840 ?        S    Mar26  21:06 /usr/local/bin/dump1090 --quiet --net --fix --json-location-accuracy 2 --write-json /run/dump1090-fa --net-bind-address 0.0.0.0 --net-only
+root      966046  0.3  0.4  30296 18060 ?        Sl   Mar26  15:31 /usr/bin/piaware -plainlog -statusfile /run/piaware/status.json
+root         526  0.1  1.4 2153420 54604 ?       Ssl  Mar24   9:00 /usr/bin/containerd
+root     2205960  0.1  0.0      0     0 ?        I    17:04   0:00 [kworker/0:0-events]
+root     2205815  0.1  0.0      0     0 ?        I    17:04   0:00 [kworker/3:2-events]
+root     2202289  0.1  0.0      0     0 ?        I    16:56   0:00 [kworker/2:0-events]
+root     2201466  0.1  0.0      0     0 ?        I    16:55   0:00 [kworker/3:3-events_freezable_pwr_efficient]
+root     2201289  0.1  0.0      0     0 ?        I    16:54   0:00 [kworker/1:3-events_power_efficient]
+root     2201016  0.1  0.0      0     0 ?        I    16:54   0:01 [kworker/0:1-events]
+root     2198766  0.1  0.0      0     0 ?        I    16:49   0:01 [kworker/0:3-events]
+root     2198587  0.1  0.0      0     0 ?        I    16:49   0:01 [kworker/2:2-events_freezable_pwr_efficient]
+root     2195472  0.1  0.0      0     0 ?        I    16:42   0:01 [kworker/3:1-events_freezable_pwr_efficient]
+nobody    966105  0.1  0.0   3252  2620 ?        S    Mar26   5:48 /usr/lib/piaware/helpers/faup1090 --net-bo-ipaddr localhost --net-bo-port 30005 --stdout
+xinzhi@tpe-goss-pi:~ $ sudo netstat -tuln
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:30005           0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:30154           0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:8081            0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:8080            0.0.0.0:*               LISTEN
+tcp6       0      0 :::31003                :::*                    LISTEN
+tcp6       0      0 :::22                   :::*                    LISTEN
+tcp6       0      0 :::30005                :::*                    LISTEN
+tcp6       0      0 :::30154                :::*                    LISTEN
+tcp6       0      0 :::30157                :::*                    LISTEN
+tcp6       0      0 :::8081                 :::*                    LISTEN
+tcp6       0      0 :::8080                 :::*                    LISTEN
+udp        0      0 0.0.0.0:5353            0.0.0.0:*
+udp        0      0 0.0.0.0:46496           0.0.0.0:*
+udp6       0      0 :::5353                 :::*
+udp6       0      0 :::35181                :::*
+xinzhi@tpe-goss-pi:~ $ find / -name "*fr24*" -type f 2>/dev/null | head -20
+xinzhi@tpe-goss-pi:~ $ find / -name "*dump1090*" -type f 2>/dev/null | head -20
+xinzhi@tpe-goss-pi:~ $
