@@ -8,7 +8,8 @@ from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(SCRIPT_DIR, "goss_v4.db")
 # 將數據輸出到項目根目錄的 public 文件夾，這樣可以直接通過 GitHub Pages 訪問
-PROJECT_ROOT = SCRIPT_DIR  # 現在腳本就在項目根目錄
+# 專案根目錄是 SCRIPT_DIR 的上一層（因為腳本在 goss-v4/goss-v4/）
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 PUBLIC_DIR = os.path.join(PROJECT_ROOT, "public")
 OUTPUT_PATH = os.path.join(PUBLIC_DIR, "live_data.json")
 
@@ -103,8 +104,14 @@ def export_live_data():
 def push_to_github():
     """将数据推送到 GitHub"""
     try:
+        # 显示当前目录信息
+        print(f"[DEBUG] 当前工作目录: {os.getcwd()}")
+        print(f"[DEBUG] PROJECT_ROOT: {PROJECT_ROOT}")
+        print(f"[DEBUG] .git 存在: {os.path.exists(os.path.join(PROJECT_ROOT, '.git'))}")
+        
         # 切换到项目根目录
         os.chdir(PROJECT_ROOT)
+        print(f"[DEBUG] 切换后工作目录: {os.getcwd()}")
         
         # 添加文件
         subprocess.run(['git', 'add', 'public/live_data.json'], check=True, capture_output=True)
