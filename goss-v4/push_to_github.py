@@ -8,7 +8,7 @@ from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(SCRIPT_DIR, "goss_v4.db")
 # 將數據輸出到項目根目錄的 public 文件夾，這樣可以直接通過 GitHub Pages 訪問
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+PROJECT_ROOT = SCRIPT_DIR  # 現在腳本就在項目根目錄
 PUBLIC_DIR = os.path.join(PROJECT_ROOT, "public")
 OUTPUT_PATH = os.path.join(PUBLIC_DIR, "live_data.json")
 
