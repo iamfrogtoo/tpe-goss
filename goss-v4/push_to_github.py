@@ -51,10 +51,13 @@ def export_live_data():
         
         flights = []
         for row in rows:
+            alt_value = row[2]
+            if alt_value == "ground" or alt_value == "None" or not alt_value:
+                alt_value = "0"
             flight = {
                 "hex": row[0],
                 "code": row[1] or "",
-                "alt": row[2] or "0",
+                "alt": str(alt_value),
                 "gs": row[3] or 0,
                 "gate": row[4] or "",
                 "is_cargo": bool(row[5]),
