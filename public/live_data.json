@@ -1,25 +1,6 @@
 {
-  "timestamp": "2026-04-06T19:45:01.924671",
+  "timestamp": "2026-04-06T19:46:01.766327",
   "flights": [
-    {
-      "hex": "76cc6c",
-      "code": "SIA621",
-      "alt": "0",
-      "gs": 0,
-      "gate": "TBD",
-      "is_cargo": false,
-      "source": "LOCAL",
-      "updated_at": "2026-04-06 11:40:22",
-      "direction": "A",
-      "scheduled_time": "",
-      "actual_time": "",
-      "status": "",
-      "terminal": "-",
-      "airline": "",
-      "actype": "",
-      "reg": "",
-      "baggage": ""
-    },
     {
       "hex": "899106",
       "code": "CAL5239",
