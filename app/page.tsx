@@ -171,9 +171,6 @@ export default function Home() {
 
   return (
     <div className="container-goss">
-      <div className="text-center text-[14px] text-[#f1c40f] mb-[20px] font-bold bg-gradient-to-r from-[rgba(241,196,15,0.1)] to-transparent py-[10px] rounded-[10px]">
-        4.0 新版測試中，敬請期待
-      </div>
       <div className="text-center text-[11px] text-[#666] mb-[10px]">{lastUpdate}</div>
 
       {flights.length === 0 && lastUpdate !== "連線中..." ? (
