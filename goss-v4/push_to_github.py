@@ -64,7 +64,7 @@ def export_live_data():
                 "is_cargo": bool(row[5]),
                 "source": row[6] or "",
                 "updated_at": row[7],
-                "direction": row[8] or "A",
+                "direction": row[8],
                 "scheduled_time": row[9] or "",
                 "actual_time": row[10] or "",
                 "status": row[11] or "",
@@ -75,8 +75,8 @@ def export_live_data():
                 "baggage": ""
             }
             
-            # 只保留進場航班（direction == 'A' 或沒有 direction 資訊）
-            if flight["direction"] == "A" or not flight["direction"]:
+            # 嚴格只保留進場航班（direction 必須為 'A'）
+            if flight["direction"] == "A":
                 flights.append(flight)
         
         # 确保 public 目录存在
@@ -144,6 +144,14 @@ if __name__ == "__main__":
     print(f"開始執行: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
     
+    try:
+        os.chdir(PROJECT_ROOT)
+        subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True)
+        subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True, capture_output=True)
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✅ 成功與遠端同步")
+    except Exception as e:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] ⚠️ 同步遠端失敗，繼續嘗試匯出: {e}")
+        
     if export_live_data():
         push_to_github()
     

@@ -245,6 +245,10 @@ def fusion_engine():
                 sch = cursor.fetchone()
                 gate, is_cargo = (sch[0], sch[1]) if sch else ("TBD", 0)
 
+                # 轉換單位：高度(公尺->英尺), 速度(公尺/秒->節)
+                alt_ft = int(s[7] * 3.28084) if s[7] is not None else ""
+                gs_kt = int(s[9] * 1.94384) if s[9] is not None else 0
+
                 # 更新到實時交通表
                 cursor.execute('''
                     INSERT OR REPLACE INTO live_traffic
@@ -253,8 +257,8 @@ def fusion_engine():
                 ''', (
                     icao,
                     callsign,
-                    str(s[7]) if s[7] else "",
-                    s[9],
+                    str(alt_ft) if alt_ft else "",
+                    gs_kt,
                     gate,
                     is_cargo
                 ))
@@ -267,7 +271,8 @@ def fusion_engine():
 
     # 3. 抓取FlightAware數據 (補位)
     fa_count = 0
-    fa_flights = get_flightaware_data()
+    # [V4調整] 暫時停用 FlightAware 抓取，做為本地天線故障時的備案
+    fa_flights = [] # get_flightaware_data()
 
     if fa_flights:
         # 获取本地入境航班列表
