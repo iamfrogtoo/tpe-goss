@@ -5,10 +5,10 @@ import Link from "next/link";
 import { FlightCodeDisplay } from "@/utils/flightFormatter";
 
 // 数据来源配置
-// 使用 jsdelivr CDN 从 GitHub 获取数据，无需 ngrok
-const API_URL = "https://cdn.jsdelivr.net/gh/iamfrogtoo/tpe-goss@main/public/live_data.json";
-// 本地測試用
-// const API_URL = "/live_data.json";
+// 本地 API 服务器获取实时数据
+const API_URL = "http://localhost:8001/live_data.json";
+// 备用 CDN 数据源
+// const API_URL = "https://cdn.jsdelivr.net/gh/iamfrogtoo/tpe-goss@main/public/live_data.json";
 
 interface Flight {
   code: string;
@@ -23,60 +23,61 @@ interface Flight {
   statusText: string;
   statusClass: string;
   isRemote: boolean;
+  direction?: string;
 }
+
+// 模拟数据 - 作为 fallback
+const getMockFlights = (): Flight[] => {
+  return [
+    {
+      code: "CI101",
+      actype: "A330-300",
+      reg: "B-18301",
+      terminal: "1",
+      gate: "A5",
+      baggage: "5",
+      sta: "10:30",
+      eta: "10:25",
+      alt: "5280",
+      statusText: "進場中",
+      statusClass: "",
+      isRemote: false
+    },
+    {
+      code: "EVA221",
+      actype: "B777-300ER",
+      reg: "B-16708",
+      terminal: "2",
+      gate: "B7",
+      baggage: "12",
+      sta: "11:15",
+      eta: "11:10",
+      alt: "3450",
+      statusText: "即將落地",
+      statusClass: "",
+      isRemote: false
+    },
+    {
+      code: "CA185",
+      actype: "B737-800",
+      reg: "B-5488",
+      terminal: "1",
+      gate: "505",
+      baggage: "8",
+      sta: "12:00",
+      eta: "12:00",
+      alt: "0",
+      statusText: "已落地",
+      statusClass: "",
+      isRemote: true
+    }
+  ];
+};
 
 export default function Home() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [lastUpdate, setLastUpdate] = useState("連線中...");
   const [dataSource, setDataSource] = useState("模擬數據");
-
-  // 模拟数据 - 作为 fallback
-  const getMockFlights = (): Flight[] => {
-    return [
-      {
-        code: "CI101",
-        actype: "A330-300",
-        reg: "B-18301",
-        terminal: "1",
-        gate: "A5",
-        baggage: "5",
-        sta: "10:30",
-        eta: "10:25",
-        alt: "5280",
-        statusText: "進場中",
-        statusClass: "",
-        isRemote: false
-      },
-      {
-        code: "EVA221",
-        actype: "B777-300ER",
-        reg: "B-16708",
-        terminal: "2",
-        gate: "B7",
-        baggage: "12",
-        sta: "11:15",
-        eta: "11:10",
-        alt: "3450",
-        statusText: "即將落地",
-        statusClass: "",
-        isRemote: false
-      },
-      {
-        code: "CA185",
-        actype: "B737-800",
-        reg: "B-5488",
-        terminal: "1",
-        gate: "505",
-        baggage: "8",
-        sta: "12:00",
-        eta: "12:00",
-        alt: "0",
-        statusText: "已落地",
-        statusClass: "",
-        isRemote: true
-      }
-    ];
-  };
 
   const processFlightData = (flightData: any): Flight => {
     let statusText = "進場中";
@@ -88,10 +89,15 @@ export default function Home() {
       statusText = "即將落地";
     }
 
+    // 根據航班方向決定狀態
+    if (flightData.direction === "D") {
+      statusText = "離場中";
+    }
+
     return {
-      code: flightData.code || flightData.flight_no || "UNKNOWN",
-      actype: flightData.actype || "",
-      reg: flightData.reg || "",
+      code: flightData.flight_no || flightData.code || "UNKNOWN",
+      actype: flightData.aircraft_type || flightData.actype || "",
+      reg: flightData.hex || flightData.reg || "",
       terminal: flightData.terminal || "-",
       gate: flightData.gate || "-",
       baggage: flightData.baggage || "-",
@@ -100,7 +106,8 @@ export default function Home() {
       alt: flightData.alt || "0",
       statusText,
       statusClass: "",
-      isRemote: flightData.gate ? (flightData.gate.startsWith('5') || flightData.gate.startsWith('6')) : false
+      isRemote: flightData.gate ? (flightData.gate.startsWith('5') || flightData.gate.startsWith('6')) : false,
+      direction: flightData.direction || ""
     };
   };
 
@@ -115,18 +122,29 @@ export default function Home() {
           const res = await fetch(`${API_URL}?t=${Date.now()}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.flights && data.flights.length > 0) {
-              parsedFlights = data.flights.map(processFlightData);
-              source = "即時數據";
-            }
+            console.log("API 回應資料:", data);
+            // 修正：即使 flights 為空，也使用真實的 API 數據
+            // 首頁只顯示進場航班 (A 方向)
+            const allFlights = data.flights ? data.flights.map(processFlightData) : [];
+            parsedFlights = allFlights.filter((flight: Flight) => {
+              // 根據航班方向篩選：A = 進場，D = 離場
+              // 首頁只顯示進場航班
+              const direction = flight.direction || '';
+              return direction === 'A';
+            });
+            source = "即時數據";
+          } else {
+            console.log("API 回應狀態碼異常:", res.status);
+            // 狀態碼異常時，不更新數據，只更新時間
+            return;
           }
         } catch (apiError) {
-          console.log("API 獲取失敗，使用模擬數據:", apiError);
+          console.log("API 獲取失敗，不更新數據:", apiError);
+          // API 失敗時，不更新數據，只更新時間
+          return;
         }
-      }
-
-      // 如果没有从 API 获取到数据，使用模拟数据
-      if (parsedFlights.length === 0) {
+      } else {
+        // 沒有配置 API_URL 時使用模擬數據
         parsedFlights = getMockFlights();
       }
 
@@ -158,7 +176,9 @@ export default function Home() {
       setDataSource(source);
       setLastUpdate(`更新: ${new Date().toLocaleTimeString()} (${sortedFlights.length}架) - ${source}`);
     } catch (error) {
-      console.error(error);
+      console.error("資料處理錯誤:", error);
+      setFlights([]);
+      setDataSource("即時數據（連線失敗）");
       setLastUpdate("連線失敗");
     }
   };
@@ -173,8 +193,14 @@ export default function Home() {
     <div className="container-goss">
       <div className="text-center text-[11px] text-[#666] mb-[10px]">{lastUpdate}</div>
 
-      {flights.length === 0 && lastUpdate !== "連線中..." ? (
-        <div className="text-center text-[#666] mt-[50px] text-[14px]">無進場航班</div>
+      {/* 版本測試公告 */}
+      <div className="bg-gradient-to-r from-[#ff6b6b] to-[#feca57] text-white text-center py-3 px-4 rounded-lg mb-4 shadow-lg">
+        <div className="font-bold text-lg mb-1">🚧 4.0版本測試中</div>
+        <div className="text-sm opacity-90">敬請期待正式版本上線</div>
+      </div>
+
+      {flights.length === 0 ? (
+        <div className="text-center text-[#666] mt-[50px] text-[14px]">目前沒有航班資訊</div>
       ) : (
         <div className="flex flex-col gap-[10px]">
           {flights.map((f, idx) => (
