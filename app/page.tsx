@@ -5,8 +5,8 @@ import Link from "next/link";
 import { FlightCodeDisplay } from "@/utils/flightFormatter";
 
 // 数据来源配置
-// 本地 API 服务器获取实时数据
-const API_URL = "http://localhost:8001/live_data.json";
+// i5 服务器 API 获取实时数据
+const API_URL = "http://192.168.31.19:8001/live_data.json";
 // 备用 CDN 数据源
 // const API_URL = "https://cdn.jsdelivr.net/gh/iamfrogtoo/tpe-goss@main/public/live_data.json";
 
