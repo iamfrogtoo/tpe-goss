@@ -94,6 +94,24 @@ export default function Home() {
       statusText = "離場中";
     }
 
+    // 修正時間欄位處理
+    let sta = flightData.scheduled_time || flightData.sta || "";
+    let eta = flightData.actual_time || flightData.eta || "";
+    
+    // 處理異常的時間格式
+    if (sta.includes("/")) {
+      // 如果 scheduled_time 包含日期，使用 status 欄位作為時間
+      sta = flightData.status || "";
+    }
+    if (eta.includes("/")) {
+      // 如果 actual_time 是日期格式，清空 ETA 顯示
+      eta = "";
+    }
+    
+    // 提取時間部分（去除日期）
+    sta = sta.split(" ").pop() || sta;
+    eta = eta.split(" ").pop() || eta;
+
     return {
       code: flightData.flight_no || flightData.code || "UNKNOWN",
       actype: flightData.aircraft_type || flightData.actype || "",
@@ -101,8 +119,8 @@ export default function Home() {
       terminal: flightData.terminal || "-",
       gate: flightData.gate || "-",
       baggage: flightData.baggage || "-",
-      sta: flightData.scheduled_time || flightData.sta || "",
-      eta: flightData.actual_time || flightData.eta || "",
+      sta: sta,
+      eta: eta,
       alt: flightData.alt || "0",
       statusText,
       statusClass: "",
