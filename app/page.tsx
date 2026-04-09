@@ -5,8 +5,10 @@ import Link from "next/link";
 import { FlightCodeDisplay } from "@/utils/flightFormatter";
 
 // 数据来源配置
-// i5 服务器 API 获取实时数据
-const API_URL = "http://192.168.31.19:8001/live_data.json";
+// 使用 Vercel API 路由代理，解决 HTTPS 混合内容问题
+const API_URL = "/api/live-data";
+// 备用：i5 服务器 API 获取实时数据
+// const API_URL = "http://192.168.31.19:8001/live_data.json";
 // 备用 CDN 数据源
 // const API_URL = "https://cdn.jsdelivr.net/gh/iamfrogtoo/tpe-goss@main/public/live_data.json";
 
