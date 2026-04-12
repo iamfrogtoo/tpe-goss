@@ -7,9 +7,11 @@ from datetime import datetime
 # 使用绝对路径
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(SCRIPT_DIR, "goss_v4.db")
-# 將數據輸出到項目根目錄的 public 文件夾，這樣可以直接通過 GitHub Pages 訪問
-# 專案根目錄是 SCRIPT_DIR 的上一層（因為腳本在 goss-v4/goss-v4/）
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+# 自動偵測 .git 所在目錄（支援本地 tpe-goss/goss-v4/ 和伺服器 /home/xinzhi/goss-v4/）
+if os.path.exists(os.path.join(SCRIPT_DIR, ".git")):
+    PROJECT_ROOT = SCRIPT_DIR  # .git 在腳本同目錄（伺服器）
+else:
+    PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)  # .git 在上層（本地）
 PUBLIC_DIR = os.path.join(PROJECT_ROOT, "public")
 OUTPUT_PATH = os.path.join(PUBLIC_DIR, "live_data.json")
 
@@ -147,7 +149,7 @@ if __name__ == "__main__":
     try:
         os.chdir(PROJECT_ROOT)
         subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True)
-        subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True, capture_output=True)
+        # subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True, capture_output=True)
         print(f"[{datetime.now().strftime('%H:%M:%S')}] ✅ 成功與遠端同步")
     except Exception as e:
         print(f"[{datetime.now().strftime('%H:%M:%S')}] ⚠️ 同步遠端失敗，繼續嘗試匯出: {e}")

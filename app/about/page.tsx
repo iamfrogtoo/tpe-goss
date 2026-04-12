@@ -52,18 +52,18 @@ export default function About() {
                 <ul className="text-[#aaa] text-[14px] leading-relaxed space-y-3 font-mono">
                     <li className="flex items-start gap-3">
                         <span className="text-[#f1c40f] font-bold shrink-0">2026/04/11</span>
-                        <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">4.0 困局</span>
-                        <span className="text-[#ccc]">4.0 版本又遇到難題，但是聽到對夥伴有幫助，開心！持續修改中。</span>
+                        <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">持續修改中</span>
+                        <span className="text-[#ccc]">4.0版本又遇到難題，但是聽到對夥伴有幫助，開心！持續修改中。</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-[#ff6b6b] font-bold shrink-0">2026/03/25</span>
+                        <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">改進方案努力中</span>
+                        <span className="text-[#ccc]">3.0架構失敗了，導致數據錯亂丟失，加上Google Token 縮水，效率變低，改進方案努力中。</span>
                     </li>
                     <li className="flex items-start gap-3">
                         <span className="text-[#f1c40f] font-bold shrink-0">2026/04/04</span>
                         <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">4.0 測試版</span>
                         <span className="text-[#ccc]">新版架構敬請期待，使用 SQLite3 資料庫，整合本地天線與 OpenSky 數據融合。</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                        <span className="text-[#ff4b4b] font-bold shrink-0">2026/03/25</span>
-                        <span className="text-white bg-[#333] px-[6px] py-[2px] rounded text-[11px] shrink-0 mt-[2px]">3.0 失效</span>
-                        <span className="text-[#ccc]">3.0 架構失敗了，導致數據錯亂丟失，加上 Google Token 縮水，效率變低，改進方案努力中。</span>
                     </li>
                     <li className="flex items-start gap-3">
                         <span className="text-[#00f260] font-bold shrink-0">2026/03/11</span>

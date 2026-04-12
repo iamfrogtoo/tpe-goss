@@ -19,6 +19,8 @@
 | 腳本名稱 | 主要功能 | 對應資料庫表 | 執行方式 |
 | :--- | :--- | :--- | :--- |
 | **bridge_v4.py** | 數據融合引擎，整合本地天線和 OpenSky 數據 | `live_traffic`, `source_antenna`, `source_opensky` | `nohup python3 -u bridge_v4.py >> bridge.log 2>&1 &` |
+| **api_server.py** | HTTP API 伺服器，提供即時數據接口 | `live_traffic`, `flight_schedule` | `nohup python3 api_server.py >> api.log 2>&1 &` |
+| **push_to_github.py** | 數據導出並推送至 GitHub | `live_traffic` | `cron: * * * * * python3 push_to_github.py` |
 | **fetch_tpe_v4.py** | 桃機班表抓取器，抓取客機和貨機班表 | `flight_schedule`, `source_airport` | `python3 fetch_tpe_v4.py` |
 | **fetch_opensky_v4.py** | OpenSky API 備援抓取 | `source_opensky` | `python3 fetch_opensky_v4.py` |
 | **fetch_fr24_v4.py** | FlightRadar24 數據抓取 | `source_fr24` | `python3 fetch_fr24_v4.py` |
@@ -40,6 +42,9 @@
 | **source_fr24** | 分區表 | FlightRadar24 原始數據 | `fetch_fr24_v4.py` |
 | **source_flightaware** | 分區表 | FlightAware 原始數據 | 待開發 |
 | **source_calair** | 分區表 | 華航郵件原始數據 | `fetch_calair_v4.py` |
+| **flight_trajectory** | 軌跡表 | 飛行軌跡記錄 | `runway_tracker.py` |
+| **runway_info** | 跑道表 | 跑道基本資訊 | `init_db.py` |
+| **runway_tracks** | 追蹤表 | 跑道使用追蹤 | `runway_tracker.py` |
 
 ## 數據流向
 
@@ -53,8 +58,14 @@
    - `bridge_v4.py` 將 `source_antenna` 和 `source_opensky` 的數據融合，存入 `live_traffic` 表
    - 融合策略：本地天線數據優先，OpenSky 數據作為備份
 
-3. **數據使用**：
-   - 前端頁面透過 API 或直接讀取資料庫，顯示 `live_traffic` 和 `flight_schedule` 表的數據
+3. **數據導出與發布**：
+   - `api_server.py` 提供 HTTP API 接口，將 `live_traffic` 數據轉換為 JSON 格式
+   - `push_to_github.py` 定期將數據導出並推送至 GitHub 倉庫
+   - GitHub + jsdelivr CDN 提供穩定的數據訪問服務
+
+4. **數據使用**：
+   - 前端頁面透過 jsdelivr CDN 獲取 `live_data.json` 數據
+   - 本地開發時可透過 `api_server.py` 直接獲取即時數據
    - `war_room_v4_viewer.py` 顯示 `live_traffic` 表的即時數據
 
 ## 部署與執行

@@ -11,7 +11,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(SCRIPT_DIR, "goss_v4.db")
 OUTPUT_PATH = os.path.join(SCRIPT_DIR, "live_data.json")
 
-PORT = 8000
+PORT = 8001
 EXPORT_INTERVAL = 10  # 每10秒导出一次数据
 
 def export_live_data():
@@ -23,6 +23,7 @@ def export_live_data():
         cursor = conn.cursor()
         
         # 获取实时交通数据，并与航班计划表关联获取更多信息
+        # 修正：只获取有航班计划的航班（与 bridge_v4.py 筛选逻辑一致）
         cursor.execute('''
             SELECT 
                 lt.hex,
@@ -41,7 +42,7 @@ def export_live_data():
                 sa.airline,
                 sa.aircraft_type
             FROM live_traffic lt
-            LEFT JOIN flight_schedule fs ON lt.flight_no = fs.flight_no
+            INNER JOIN flight_schedule fs ON lt.flight_no = fs.flight_no  -- 只保留有航班计划的航班
             LEFT JOIN (
                 SELECT flight_no, terminal, airline, aircraft_type, MAX(updated_at) as latest_update
                 FROM source_airport
@@ -75,9 +76,9 @@ def export_live_data():
                 "baggage": ""
             }
             
-            # 只保留進場航班（direction == 'A' 或沒有 direction 資訊）
-            if flight["direction"] == "A" or not flight["direction"]:
-                flights.append(flight)
+            # 修正：保留所有有航班计划的航班（与 bridge_v4.py 筛选逻辑一致）
+            # 不再限制只显示进场航班，让前端根据 direction 字段自行筛选
+            flights.append(flight)
         
         # 导出为 JSON
         result = {
@@ -118,7 +119,8 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
     
     def do_GET(self):
-        if self.path == '/live_data.json' or self.path == '/':
+        # 支援新舊端點
+        if self.path == '/live_data.json' or self.path == '/' or self.path.startswith('/api/flights'):
             self.path = '/live_data.json'
         return super().do_GET()
 

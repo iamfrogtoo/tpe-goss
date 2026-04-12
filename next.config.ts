@@ -22,10 +22,11 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      {
-        source: '/api/data/:path*',
-        destination: 'http://192.168.31.19:8080/dashboard/data/:path*',
-      },
+      // 移除指向私有 IP 的重寫規則，避免 Vercel 部署時連接超時
+      // {
+      //   source: '/api/data/:path*',
+      //   destination: 'http://192.168.31.19:8080/dashboard/data/:path*',
+      // },
     ];
   },
 };

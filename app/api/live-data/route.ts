@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       { 
         error: '無法獲取即時資料',
         timestamp: new Date().toISOString(),
-        details: error.message
+        details: error instanceof Error ? error.message : '未知錯誤'
       },
       { 
         status: 500,
