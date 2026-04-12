@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export default function About() {
     return (
         <div className="container-goss">
