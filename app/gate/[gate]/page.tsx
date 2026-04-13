@@ -198,7 +198,7 @@ export default function GateDetail() {
                                         <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(event.status || '')}`}>
                                             {getTypeLabel(event.type)}
                                         </span>
-                                        <FlightCodeDisplay code={event.flight} />
+                                        <FlightCodeDisplay rawCode={event.flight} />
                                         {event.status && (
                                             <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(event.status)}`}>
                                                 {event.status}

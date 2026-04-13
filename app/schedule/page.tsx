@@ -202,7 +202,7 @@ export default function Schedule() {
                                 <div key={`${flight.code}-${flight.time}-${index}`} className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 transition-colors">
                                     <div className="col-span-2 font-medium text-gray-900">{flight.time}</div>
                                     <div className="col-span-2">
-                                        <FlightCodeDisplay code={flight.code} />
+                                        <FlightCodeDisplay rawCode={flight.code} />
                                     </div>
                                     <div className="col-span-2 text-gray-600">
                                         {flight.type === "ARR" ? "抵達" : "出發"}

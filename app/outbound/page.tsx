@@ -158,7 +158,7 @@ export default function OutboundFlights() {
                                 <div key={`${flight.code}-${flight.time}-${index}`} className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 transition-colors">
                                     <div className="col-span-2 font-medium text-gray-900">{flight.time}</div>
                                     <div className="col-span-3">
-                                        <FlightCodeDisplay code={flight.code} />
+                                        <FlightCodeDisplay rawCode={flight.code} />
                                     </div>
                                     <div className="col-span-1">
                                         {flight.gate ? (
